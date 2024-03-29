@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { ScreenOrientation } from 'expo-screen-orientation';
+import { Haptics } from 'expo-haptics';
+
+
 
 const MemoryMatchGame = () => {
+    // Lock screen orientation to landscape mode for now.....
+    useEffect(() => {
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+    }, []);
+
     const [cards, setCards] = useState(Array(12).fill().map((_, index) => ({ id: index, value: index % 6, flipped: false })));
     const [flippedCards, setFlippedCards] = useState([]);
 
@@ -43,6 +52,8 @@ const MemoryMatchGame = () => {
                 }
             }));
             setFlippedCards(prevFlippedCards => [...prevFlippedCards, card]);
+
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);  // This should give some haptic feedback when a card is flipped
         }
     };
 
