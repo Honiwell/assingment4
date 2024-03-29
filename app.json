@@ -7,7 +7,7 @@
     "icon": "./assets/memoryicon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/memory.jpg",
+      "image": "./assets/memoryicon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
