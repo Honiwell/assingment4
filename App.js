@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { ScreenOrientation } from 'expo-screen-orientation';
 import { Haptics } from 'expo-haptics';
-
+import * as ImagePicker from 'expo-image-picker';
 
 
 const MemoryMatchGame = () => {
@@ -57,6 +57,29 @@ const MemoryMatchGame = () => {
         }
     };
 
+    //courtesy of Chatgpt
+    //This should allow the user to select images from their device's gallery.
+    const handleImagePick = async (cardId) => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status === 'granted') {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 1,
+            });
+            if (!result.cancelled) {
+                setCards(prevCards => prevCards.map(card => {
+                    if (card.id === cardId) {
+                        return { ...card, image: result.uri };
+                    } else {
+                        return card;
+                    }
+                }));
+            }
+        }
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.gridContainer}>
@@ -67,7 +90,12 @@ const MemoryMatchGame = () => {
                         onPress={() => handleCardPress(card)}
                         disabled={flippedCards.length === 2 || card.flipped}
                     >
-                        {card.flipped && <Text>{card.value}</Text>}
+                        {card.flipped && card.image && <Image source={{ uri: card.image }} style={styles.cardImage} />}
+                        {card.flipped && !card.image && <Text>{card.value}</Text>}
+                        {!card.flipped && <Text>Select Image</Text>}
+                        <TouchableOpacity onPress={() => handleImagePick(card.id)} style={styles.pickImageButton}>
+                            <Text>Choose</Text>
+                        </TouchableOpacity>
                     </TouchableOpacity>
                 ))}
             </View>
@@ -89,8 +117,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     card: {
-        width: 50,
-        height: 50,
+        width: 100,
+        height: 100,
         backgroundColor: '#cce',
         margin: 5,
         justifyContent: 'center',
@@ -100,6 +128,19 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#000',
+    },
+    cardImage: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover',
+    },
+    pickImageButton: {
+        position: 'absolute',
+        bottom: 5,
+        right: 5,
+        padding: 5,
+        backgroundColor: 'rgba(255, 255, 255, 0.5)',
+        borderRadius: 5,
     },
 });
 
